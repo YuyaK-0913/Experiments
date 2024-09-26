@@ -1,0 +1,20 @@
+version: "3"
+
+services:
+
+  jupyter:
+    container_name: jupyter
+    build:
+      context: ./jupyter
+      dockerfile: Dockerfile
+    # image: jupyter/base-notebook:latest
+    ports:
+      - 8888:8888
+    volumes:
+      - type: bind
+        source: ./jupyter/work
+        target: /home/jovyan/work
+    environment: 
+      JUPYTER_TOKEN : ''
+    command: start.sh jupyter lab --NotebookApp.token=''
+

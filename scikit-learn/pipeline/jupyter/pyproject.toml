@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "scikit-learn-pipeline-experiments"
+version = "0.1.0"
+description = ""
+authors = ["Yuya-0913 <kuniyu.0913@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+numpy = "^2.1.1"
+pandas = "^2.2.3"
+scikit-learn = "^1.5.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
