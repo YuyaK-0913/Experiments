@@ -1,0 +1,83 @@
+# ベースイメージとしてUbuntu 20.04を使用
+FROM ubuntu:20.04
+
+# 環境変数の設定
+ENV PYTHON_VERSION=3.7.3
+ENV DEBIAN_FRONTEND=noninteractive
+
+# 必要なパッケージのインストール
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    curl \
+    git \
+    ca-certificates \
+    libssl-dev \
+    zlib1g-dev \
+    libbz2-dev \
+    libreadline-dev \
+    libsqlite3-dev \
+    wget \
+    llvm \
+    libncurses5-dev \
+    libncursesw5-dev \
+    xz-utils \
+    tk-dev \
+    libffi-dev \
+    liblzma-dev \
+    libgdbm-dev \
+    libnss3-dev \
+    libgdbm-compat-dev \
+    libboost-all-dev \
+    cmake \
+    && rm -rf /var/lib/apt/lists/*
+
+# pyenvのインストール
+RUN git clone https://github.com/pyenv/pyenv.git /root/.pyenv
+
+# 環境変数の設定
+ENV PYENV_ROOT="/root/.pyenv"
+ENV PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$PATH"
+
+# pyenv-virtualenvのインストール（必要に応じて）
+RUN git clone https://github.com/pyenv/pyenv-virtualenv.git $PYENV_ROOT/plugins/pyenv-virtualenv
+
+# pyenvの初期化
+RUN echo 'export PYENV_ROOT="/root/.pyenv"' >> /root/.bashrc && \
+    echo 'export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$PATH"' >> /root/.bashrc && \
+    echo 'eval "$(pyenv init --path)"' >> /root/.bashrc && \
+    echo 'eval "$(pyenv init -)"' >> /root/.bashrc
+
+# 環境変数の設定
+ENV PYENV_ROOT="/root/.pyenv"
+ENV PATH="$PYENV_ROOT/bin:$PATH"
+
+# pyenvで指定のPythonバージョンをインストール
+RUN pyenv install $PYTHON_VERSION && \
+    pyenv global $PYTHON_VERSION
+
+# # Pythonのパスを環境変数に追加
+# ENV PATH="$PYENV_ROOT/versions/$PYTHON_VERSION/bin:$PATH"
+
+# # poetryのインストール
+# RUN curl -sSL https://install.python-poetry.org | python -
+
+# # poetryのパスを環境変数に追加
+# ENV PATH="/root/.local/bin:$PATH"
+
+# # インストールの確認
+# RUN python --version && poetry --version
+
+# デフォルトのコマンド
+CMD ["/bin/bash", "-c", "while true; do sleep 1; done"]
+
+
+# # Python 3.7.13のインストール
+# RUN pyenv install 3.7.3
+# RUN pyenv global 3.7.3
+
+
+# ARG LOCAL_DIR=server
+# ENV PROJECT_DIR work
+# WORKDIR /${PROJECT_DIR}
+
+# COPY ${LOCAL_DIR}/ /${PROJECT_DIR}/

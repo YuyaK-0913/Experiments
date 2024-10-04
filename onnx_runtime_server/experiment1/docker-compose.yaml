@@ -1,0 +1,11 @@
+version: "3"
+
+services:
+
+  jupyter:
+    container_name: sever
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    # image: jupyter/base-notebook:latest
+

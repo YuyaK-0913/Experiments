@@ -1,0 +1,32 @@
+## モデルのビルド
+FROM python:3.10.6-slim as builder
+# FROM python:3.10.6-slim
+
+WORKDIR /work
+COPY ./server/requirements.txt .
+COPY ./server/__init__.py .
+COPY ./server/sklearn_elasticnet.py .
+
+RUN apt-get -y update && \
+    apt-get -y install apt-utils gcc && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    pip install --no-cache-dir -r requirements.txt && \
+    python -m sklearn_elasticnet
+
+# CMD ["/bin/bash", "-c", "while true; do sleep 1; done"]
+
+## ビルドしたモデルをONNX Runtime Serverにデプロイ
+FROM mcr.microsoft.com/onnxruntime/server:latest
+# FROM python:3.10.6-slim
+
+WORKDIR /work
+COPY --from=builder /work/models/elasticnet.onnx /work/models/elasticnet.onnx
+
+CMD ["/bin/bash", "-c", "while true; do sleep 1; done"]
+
+WORKDIR /onnxruntime/server/
+COPY ./server/onnx_runtime_server_entrypoint.sh .
+RUN chmod +x onnx_runtime_server_entrypoint.sh
+ENTRYPOINT ["./onnx_runtime_server_entrypoint.sh"]
+

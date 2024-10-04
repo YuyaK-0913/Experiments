@@ -1,0 +1,35 @@
+# FROM python:3.10.6-slim
+FROM python:3.8-slim
+
+WORKDIR /work
+COPY ./client/__init__.py .
+COPY ./client/requests_grpc.py .
+COPY ./client/requests_http.py .
+COPY ./client/requirements.txt .
+COPY ./proto ./proto
+
+RUN apt-get -y update && \
+    apt-get -y install apt-utils gcc && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+CMD ["/bin/bash", "-c", "while true; do sleep 1; done"]
+
+# FROM jupyter/base-notebook:python-3.10.6
+
+# USER root
+
+# COPY ./client/requirements.txt /home/jovyan/requirements.txt
+# COPY ./proto /home/jovyan/work
+
+# RUN pip install --upgrade pip
+# RUN pip install -r /home/jovyan/requirements.txt
+
+# USER jovyan
+
+# WORKDIR /home/jovyan/work
+# COPY ./proto /home/jovyan/work/
+
+

@@ -1,0 +1,37 @@
+version: "3"
+
+services:
+  onnx_runtime_server:
+    container_name: server
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    restart: always
+    environment:
+      - HTTP_PORT=8001
+      - GRPC_PORT=50051
+    ports:
+      - "8001:8001"
+      - "50051:50051"
+    entrypoint: ["./onnx_runtime_server_entrypoint.sh"]
+
+  client:
+    container_name: client
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    
+  # jupyter:
+  #   container_name: jupyter
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.client
+  #   ports:
+  #     - 8888:8888
+  #   volumes:
+  #     - type: bind
+  #       source: ./client/work
+  #       target: /home/jovyan/work
+  #   environment: 
+  #     JUPYTER_TOKEN : ''
+  #   command: start.sh jupyter lab --NotebookApp.token=''
