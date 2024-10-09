@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "jupyter"
+version = "0.1.0"
+description = ""
+authors = ["YuyaK-0913 <kuniyu.0913@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pandas = "^2.2.3"
+numpy = "^2.1.2"
+scikit-learn = "^1.5.2"
+mlflow = "^2.16.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

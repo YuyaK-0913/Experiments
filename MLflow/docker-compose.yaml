@@ -1,0 +1,88 @@
+version: "3"
+
+services:
+
+  jupyter:
+    container_name: jupyter
+    build:
+      context: ./jupyter
+      dockerfile: Dockerfile
+    ports:
+      - 8888:8888
+    volumes:
+      - type: bind
+        source: ./jupyter/work
+        target: /home/jovyan/work
+    environment: 
+      JUPYTER_TOKEN : ''
+    command: start.sh jupyter lab --NotebookApp.token=''
+
+  mlflow:
+    container_name: mlflow
+    build:
+      context: ./mlflow
+      dockerfile: Dockerfile
+    volumes:
+      - ./mlflow/outputs/mlruns:/opt/outputs/mlruns
+    command:
+      - "mlflow"
+      - "server"
+      - "--backend-store-uri"
+      # - "/opt/outputs/mlruns"
+      - "postgresql://postgres:password@postgres:5432/mlflow_test"
+      - "--default-artifact-root"
+      # - "/opt/outputs/mlruns"
+      - "ftp://ftpuser:ftppassword@ftp-server/mlflow/"
+      - "--host"
+      - "0.0.0.0"
+    ports:
+      - 5000:5000
+    restart: always
+    depends_on:
+      - postgres
+      - ftp-server
+
+  postgres:
+    image: postgres:14.3
+    container_name: postgres
+    volumes:
+      - ./postgres/init:/docker-entrypoint-initdb.d
+    networks:
+      - default
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=mlflow_test
+      - POSTGRES_INITDB_ARGS="--encoding=UTF-8"
+    ports:
+      - 5432:5432
+    restart: always
+    stdin_open: true
+
+  ftp-server:
+    image: stilliard/pure-ftpd:latest
+    container_name: ftp-server
+    environment:
+      - FTP_USER_NAME=ftpuser
+      - FTP_USER_PASS=ftppassword
+      - FTP_USER_HOME=/home/ftpuser
+    volumes:
+      - ./ftp:/home/ftpuser
+    ports:
+      - "21:21"
+      - "30000-30009:30000-30009"
+    restart: always
+
+  # pgadmin:
+  #   image: dpage/pgadmin4:latest
+  #   container_name: pgadmin
+  #   environment:
+  #     - PGADMIN_DEFAULT_EMAIL=admin@example.com
+  #     - PGADMIN_DEFAULT_PASSWORD=admin
+  #   ports:
+  #     - "5050:80"
+  #   volumes:
+  #     - ./pgadmin:/var/lib/pgadmin
+  #   restart: always
+  #   depends_on:
+  #     - postgres
